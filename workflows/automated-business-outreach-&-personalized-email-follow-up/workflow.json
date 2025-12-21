@@ -1,0 +1,257 @@
+{
+  "name": "Automated Business Outreach & Personalized Email Follow-Up",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-240, -48],
+      "id": "4e96cecb-1219-44eb-a015-1ec8b750847b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM",
+          "mode": "list",
+          "cachedResultName": "User Information",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-32, -48],
+      "id": "360d5240-4713-44fa-bfc2-76b57a5856d2",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1gqQPAXWdKqxaSAB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [176, -48],
+      "id": "adceaca2-1cc8-45a4-aa73-1ca2a73a5bb6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "sendTo": "{{ $env.RECIPIENT_EMAIL }}",
+        "subject": "=Hello,  {{ $json['First Name'] }} ",
+        "message": "How can i help you to grow your bussines.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [384, 48],
+      "id": "304d2126-f9d4-45a0-8a92-1b8c7fca53b4",
+      "name": "Send a message",
+      "webhookId": "{{ $env.WEBHOOK_ID }}",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "{{ $env.GMAIL_OAUTH_CREDENTIAL_ID }}",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM",
+          "mode": "list",
+          "cachedResultName": "User Information",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KZ6khp4kTBy5SyXyIBIkbBodZ7tAsQIMK11242MkIEM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email Sent": "=Success",
+            "submittedAt": "={{ $('Get row(s) in sheet').item.json.submittedAt }}"
+          },
+          "matchingColumns": ["submittedAt"],
+          "schema": [
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "submittedAt",
+              "displayName": "submittedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "formMode",
+              "displayName": "formMode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email Sent",
+              "displayName": "Email Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [528, 176],
+      "id": "be4d7c5c-c8c8-4580-910a-89fd07f5cbd0",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1gqQPAXWdKqxaSAB",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4a567513-2329-4138-b802-c44becd792a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8035e339bd3670866dc8a8ee31cc1b82ab6e940b9e5a0e2e4868bcb946f395ce"
+  },
+  "id": "qLcb2CFPd5B1ac9Z",
+  "tags": []
+}
