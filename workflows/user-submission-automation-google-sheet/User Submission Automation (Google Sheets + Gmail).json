@@ -1,0 +1,159 @@
+{
+  "name": "User Submission Automation (Google Sheets + Gmail)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "User Registration",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name",
+              "placeholder": "e.g: john",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Last Name",
+              "placeholder": "e.g: doe",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "placeholder": "e.g: johndoe@gmail.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-224, -96],
+      "id": "5cb3dc77-0fb9-4f65-84cd-a363a140028f",
+      "name": "On form submission",
+      "webhookId": "{{$env[\"WEBHOOK_ID\"]}}"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "{{$env[\"GOOGLE_SHEETS_DOCUMENT_ID\"]}}",
+          "mode": "list",
+          "cachedResultName": "User Information",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/{{$env[\"GOOGLE_SHEETS_DOCUMENT_ID\"]}}/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "{{$env[\"GOOGLE_SHEETS_SHEET_NAME\"]}}",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/{{$env[\"GOOGLE_SHEETS_DOCUMENT_ID\"]}}/edit#{{$env[\"GOOGLE_SHEETS_SHEET_NAME\"]}}"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "submittedAt",
+              "displayName": "submittedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "formMode",
+              "displayName": "formMode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-16, -96],
+      "id": "52537e84-4909-45d4-9786-9fc741e07343",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1gqQPAXWdKqxaSAB",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c966598d-42ba-4e9a-a0ab-7fae88e344d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{$env[\"INSTANCE_ID\"]}}"
+  },
+  "id": "Lh31CNPsuwDp6yMc",
+  "tags": []
+}
