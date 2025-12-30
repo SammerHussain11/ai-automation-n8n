@@ -21,47 +21,50 @@
 - Airtable base with `First Name`, `Email`, and `Birthday` fields.
 - Gmail (OAuth2) or another mail provider configured as credentials in n8n.
 
-**Quick Start — Import & Configure**
+# ## Quick Start — Import & Configure
 
-1. Open n8n and choose Import > From File, then paste the `workflow.json` included in this repository.
-2. Create credentials in n8n for Airtable and Gmail:
-   - Airtable: Personal Access Token or API key with access to the target base and table.
-   - Gmail: OAuth2 credentials configured in n8n.
-3. Update the Airtable node to point to your Base and Table, and verify the date formula or filter field mappings.
-4. Set the workflow to Active mode. The schedule trigger will run at its configured time.
+1. Open n8n → Import → From File, then paste the `workflow.json` from this repository.
+2. Add credentials in n8n:
+   - Airtable: Personal Access Token / API key.
+   - Gmail: OAuth2 credentials.
+3. Update the Airtable node to reference your base/table and verify field mappings.
+4. Activate the workflow; the schedule trigger will run at its configured time.
 
-**Workflow Overview (nodes summary)**
+## Workflow Overview
 
-- `Schedule Trigger` — Runs daily at the chosen hour.
-- `Airtable (Search Records)` — Finds records where DAY({Birthday}) = DAY(TODAY()) and MONTH({Birthday}) = MONTH(TODAY()).
-- `SplitInBatches` — Processes individual records in manageable chunks.
-- `Gmail (Send Email)` — Sends a personalized message to each matched contact; subject and body are templated with `{{ $json["First Name"] }}` and other fields.
+- `Schedule Trigger` — Runs daily at the configured hour.
+- `Airtable (Search Records)` — Uses a day/month formula to find today's birthdays.
+- `SplitInBatches` — Processes records in batches for stability.
+- `Gmail (Send Email)` — Sends personalized messages using templated fields.
 
-**Recommended Airtable Formula**
-Use a formula that ignores year and matches month/day, for example:
+## Recommended Airtable Formula
+
+Use this formula to match month/day and ignore year:
 
 ```text
 AND( DAY({Birthday}) = DAY(TODAY()), MONTH({Birthday}) = MONTH(TODAY()) )
 ```
 
-**Customization Ideas**
+## Customization Ideas
 
-- Add an `If` node to use different templates for clients, VIPs, or employees.
-- Add a CRM update node to write a timestamp back to Airtable after a message is sent.
-- Add Slack or Teams notifications for internal visibility on VIP events.
+- Use an `If` node to send different templates for clients, VIPs, or employees.
+- Add an Airtable `Update` node to log that an email was sent (timestamp).
+- Add Slack/Teams notifications for internal visibility on VIP birthdays.
 
-**Troubleshooting**
+## Troubleshooting
 
-- If no results are returned, confirm the `Birthday` field uses a valid date format and contains values.
-- If emails are not sending, verify Gmail credentials and review n8n execution logs for SMTP/OAuth errors.
+- No matches: confirm `Birthday` is a proper date field and populated.
+- Email failures: verify Gmail OAuth credentials and check n8n execution logs.
 
-**Contributing & Support**
-If you want enhancements or fixes, open an issue or submit a pull request outlining the change and rationale.
+## Contributing & Support
 
-**License & Contact**
-This repository contains workflow configurations and documentation. Clarify licensing or usage terms here if needed.
+Contributions welcome — open an issue or submit a pull request describing the change.
 
-For questions or help with setup, open an issue or contact the maintainer.
+## License & Contact
+
+This repository contains workflow configuration and documentation. Add or clarify licensing information as needed.
+
+For setup help or questions, open an issue or contact the maintainer.
 
 ---
 
