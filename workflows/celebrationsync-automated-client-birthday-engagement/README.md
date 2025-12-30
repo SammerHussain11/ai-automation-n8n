@@ -1,19 +1,25 @@
-**CelebrationSync — Automated Birthday Engagement**
+# 🎂 CelebrationSync — Automated Birthday Engagement
 
-CelebrationSync is an n8n workflow that automates personalized birthday outreach for clients, employees, or contacts stored in Airtable. It runs daily, finds matching birthdays (ignoring year), and sends tailored emails via Gmail.
+[![n8n workflow](https://img.shields.io/badge/n8n-workflow-blue?logo=n8n&style=flat)](https://n8n.io) [![License](https://img.shields.io/badge/license-UNSPECIFIED-lightgrey?style=flat)](LICENSE)
 
-**Features**
+> Automated, personalized birthday outreach for clients and employees using Airtable + Gmail.
 
-- **Daily scheduling:** Runs automatically each morning to ensure timely outreach.
-- **Airtable integration:** Queries records by day/month to find today's birthdays.
-- **Personalized email delivery:** Sends individualized messages via Gmail using recipient fields.
-- **Scalable batching:** Processes multiple recipients safely using split/batch logic.
+> — Runs daily and delivers friendly, templated email greetings.
 
-**Prerequisites**
+---
 
-- n8n (self-hosted or cloud) with a working execution environment.
-- An Airtable base containing contact records with at least `First Name`, `Email`, and `Birthday` fields.
-- A Gmail account configured in n8n (OAuth2 credentials) or another mail provider node.
+## Features
+
+- **Daily scheduling:** Executes automatically each morning for reliable outreach.
+- **Airtable integration:** Filters records by day/month to match today's birthdays.
+- **Personalized delivery:** Sends templated, individualized emails via Gmail.
+- **Scalable batching:** Uses split/batch processing to handle large contact lists safely.
+
+## Prerequisites
+
+- n8n (cloud or self-hosted) with access to credentials management.
+- Airtable base with `First Name`, `Email`, and `Birthday` fields.
+- Gmail (OAuth2) or another mail provider configured as credentials in n8n.
 
 **Quick Start — Import & Configure**
 
