@@ -1,0 +1,929 @@
+{
+  "name": "Customer Support",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "d07de2e9-21f9-41dd-9c3b-25d9cdba2f3c",
+      "name": "Telegram Bot Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        272
+      ],
+      "webhookId": "YOUR_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "user-info-001",
+              "name": "user_id",
+              "type": "string",
+              "value": "={{ $json.message.from.id }}"
+            },
+            {
+              "id": "user-info-002",
+              "name": "user_name",
+              "type": "string",
+              "value": "={{ $json.message.from.first_name }} {{ $json.message.from.last_name || '' }}"
+            },
+            {
+              "id": "user-info-003",
+              "name": "username",
+              "type": "string",
+              "value": "={{ $json.message.from.first_name }} {{ $json.message.from.last_name || '' }}"
+            },
+            {
+              "id": "user-info-004",
+              "name": "message_text",
+              "type": "string",
+              "value": "={{ $json.message.text }}"
+            },
+            {
+              "id": "user-info-005",
+              "name": "chat_id",
+              "type": "string",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "id": "user-info-006",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1c80c4a-47c7-4b40-8d65-148d10fb03e1",
+      "name": "Extract User Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "help-command",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "/start"
+            },
+            {
+              "id": "help-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "help"
+            },
+            {
+              "id": "hello-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "hello"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "548bd83c-14d4-4489-b211-37b6114845af",
+      "name": "Is Help Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "=👋 Hello {{ $json.username }}!\n\nWelcome to our Customer Support Bot. I can help you with:\n\n🔍 **Order Status** - Type your order number\n📋 **FAQ** - Common questions and answers\n📞 **Contact Support** - Connect with human agent\n💳 **Billing** - Billing and payment questions\n🚚 **Shipping** - Delivery information\n\nJust type what you need help with, or use these commands:\n• /faq - View frequently asked questions\n• /contact - Speak to human support\n• /status - Check order status\n\nHow can I assist you today?",
+        "additionalFields": {}
+      },
+      "id": "9236ae7f-afdf-404a-a41b-1bdb76aea96f",
+      "name": "Send Welcome Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        -96
+      ],
+      "webhookId": "cfe7f553-1737-4755-b842-2f361ce1c599",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "order-regex",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "\\b[A-Z]{2}\\d{6,8}\\b|\\border\\b|\\bstatus\\b|/status"
+            },
+            {
+              "id": "tracking-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "track"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "cc526789-182d-4b13-a59a-63de2d4d5eb4",
+      "name": "Is Order Inquiry?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "📦 **Order Status Check**\n\nTo check your order status, please provide your order number (format: AB123456).\n\nIf you don't have your order number:\n• Check your email confirmation\n• Look for text message confirmation\n• Contact us at /contact for assistance\n\n💡 **Quick Status Guide:**\n✅ Processing - Order received and being prepared\n📦 Shipped - Order dispatched from warehouse\n🚚 In Transit - On the way to you\n📬 Delivered - Package delivered\n\nPlease type your order number:",
+        "additionalFields": {}
+      },
+      "id": "8105a693-28ad-4f8f-9e2c-13e88479e26a",
+      "name": "Handle Order Status",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        112
+      ],
+      "webhookId": "2de2622d-0574-4fee-9161-f12a69c6984c",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "faq-command",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "/faq"
+            },
+            {
+              "id": "faq-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "faq"
+            },
+            {
+              "id": "question-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "question"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "4d4ca994-f3f8-4d36-868a-a93135e1b115",
+      "name": "Is FAQ Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "❓ **Frequently Asked Questions**\n\n**📋 General Questions:**\n• What are your business hours? - Monday-Friday 9AM-6PM EST\n• Where do you ship? - We ship worldwide\n• What payment methods do you accept? - Credit cards, PayPal, bank transfer\n\n**🚚 Shipping & Returns:**\n• How long does shipping take? - 3-5 business days domestic, 7-14 international\n• What's your return policy? - 30-day return policy for unused items\n• Do you offer free shipping? - Free shipping on orders over $50\n\n**💳 Billing:**\n• When will my card be charged? - When order ships\n• Can I change my billing address? - Yes, contact support before shipping\n\n**🔧 Technical Support:**\n• How do I set up my account? - Check your welcome email for instructions\n• I forgot my password - Use password reset on login page\n\nNeed more help? Type /contact to speak with our team!",
+        "additionalFields": {}
+      },
+      "id": "bee9cf03-fd54-43e2-99d4-8c7d961ebe89",
+      "name": "Send FAQ",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        320
+      ],
+      "webhookId": "53c4e11a-b5e6-4079-8b3b-56e931e8d491",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "contact-command",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "/contact"
+            },
+            {
+              "id": "human-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "human"
+            },
+            {
+              "id": "agent-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "agent"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "a0698854-6aee-4937-8b13-d87b5fbabc15",
+      "name": "Need Human Support?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_SUPPORT_TEAM_CHAT_ID",
+        "text": "🚨 **New Support Request**\n\n👤 **User:** {{ $json.user_name }} (@{{ $json.username }})\n📱 **User ID:** {{ $json.user_id }}\n💬 **Message:** {{ $json.message_text }}\n⏰ **Time:** {{ $json.timestamp }}\n\n**Chat ID to respond:** {{ $json.chat_id }}\n\n*Reply directly to this user via Telegram or your preferred support channel.*",
+        "additionalFields": {}
+      },
+      "id": "84286b48-f290-45b9-a906-965128aa1dc7",
+      "name": "Notify Support Team",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        576
+      ],
+      "webhookId": "d2608478-4c96-42c6-9c80-eb8644c28e24",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "📞 **Human Support Requested**\n\nI've notified our support team about your inquiry. A human agent will contact you shortly!\n\n⏱️ **Response Times:**\n• Business Hours: Within 30 minutes\n• After Hours: Next business day\n\n📧 **Alternative Contact:**\n• Email: support@yourcompany.com\n• Phone: +1-800-XXX-XXXX\n\nYour message: \"{{ $json.message_text }}\"\n\nIs there anything else I can help you with while you wait?",
+        "additionalFields": {}
+      },
+      "id": "13165678-00d3-4a58-a06b-dc63915925eb",
+      "name": "Confirm Human Escalation",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        528
+      ],
+      "webhookId": "a0d92650-2857-468a-a9b4-9e9faa79dc59",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Nzn7oJt-77Qf-zkGp_cT2GvqK3_GczTATu6j40I4ZVA",
+          "mode": "list",
+          "cachedResultName": "Support_Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Nzn7oJt-77Qf-zkGp_cT2GvqK3_GczTATu6j40I4ZVA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Nzn7oJt-77Qf-zkGp_cT2GvqK3_GczTATu6j40I4ZVA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "User_ID": "={{ $('Extract User Data').item.json.user_id }}",
+            "User_Name": "={{ $('Extract User Data').item.json.user_name }}",
+            "Username": "={{ $('Extract User Data').item.json.username }}",
+            "Message": "={{ $('Extract User Data').item.json.message_text }}",
+            "Chat_ID": "={{ $('Extract User Data').item.json.chat_id }}",
+            "Timestamp": "={{ $('Extract User Data').item.json.timestamp }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User_ID",
+              "displayName": "User_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User_Name",
+              "displayName": "User_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7cc05394-56d3-4112-bac1-debbc62c3630",
+      "name": "Log Support Request",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        848,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZOBvDguS3Tcf3dGD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "🤖 **I'm here to help!**\n\nI didn't quite understand your request. Here's what I can help you with:\n\n**📋 Available Commands:**\n• `/start` or `/help` - Show this menu\n• `/faq` - View frequently asked questions\n• `/contact` - Connect with human support\n• `/status` - Check order status\n\n**💡 Or just type:**\n• Your order number (e.g., AB123456)\n• \"billing question\"\n• \"shipping info\" \n• \"need help with...\"\n\nWhat would you like assistance with?",
+        "additionalFields": {}
+      },
+      "id": "69d088e6-79c2-4048-a308-f3e851af793c",
+      "name": "Send Default Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        752
+      ],
+      "webhookId": "16089325-e192-4bff-b0cd-5062b294d173",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "billing-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "billing"
+            },
+            {
+              "id": "payment-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "payment"
+            },
+            {
+              "id": "invoice-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "invoice"
+            },
+            {
+              "id": "refund-keyword",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "caseSensitive": false
+              },
+              "leftValue": "={{ $json.message_text }}",
+              "rightValue": "refund"
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "6c5244ab-7612-4d0f-9db6-4dfcfe8bf5e4",
+      "name": "Is Billing Question?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "💳 **Billing & Payment Help**\n\n**Common Billing Questions:**\n\n💰 **Payment Issues:**\n• Payment declined? Check with your bank or try different card\n• PayPal not working? Ensure account has sufficient funds\n• Need payment plan? Contact support for options\n\n📄 **Invoices & Receipts:**\n• Download from your account dashboard\n• Email copy sent to registered email\n• Need different format? Contact accounting team\n\n💸 **Refunds:**\n• Refund requests processed within 3-5 business days\n• Money returns to original payment method\n• Questions about refund status? Type /contact\n\n🔄 **Subscription Management:**\n• Cancel anytime from account settings\n• Changes take effect next billing cycle\n• Prorated refunds available for downgrades\n\nNeed specific help? Type /contact to reach our billing team!",
+        "additionalFields": {}
+      },
+      "id": "fc9e2763-0d39-4269-907b-f74f0d76af7c",
+      "name": "Handle Billing Questions",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        928
+      ],
+      "webhookId": "5f9870ec-9927-4584-bf5c-4db5ee805df2",
+      "credentials": {
+        "telegramApi": {
+          "id": "RhQPjZ75sIfbYLdm",
+          "name": "bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "173vUeL0V9WMA13aRO3iN8x28xYYPoP42xKYMlurkQ2Y",
+          "mode": "list",
+          "cachedResultName": "Bot_Interactions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/173vUeL0V9WMA13aRO3iN8x28xYYPoP42xKYMlurkQ2Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/173vUeL0V9WMA13aRO3iN8x28xYYPoP42xKYMlurkQ2Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Extract User Data').item.json.timestamp }}",
+            "User_ID": "={{ $('Extract User Data').item.json.user_id }}",
+            "User_Name": "={{ $('Extract User Data').item.json.user_name }}",
+            "Username": "={{ $('Extract User Data').item.json.username }}",
+            "Message": "={{ $('Extract User Data').item.json.message_text }}",
+            "Chat_ID": "={{ $('Extract User Data').item.json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User_ID",
+              "displayName": "User_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User_Name",
+              "displayName": "User_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat_ID",
+              "displayName": "Chat_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Response_Type",
+              "displayName": "Response_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d0b4bee4-feee-4154-9a6d-a96db613dab8",
+      "name": "Log Bot Interaction",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        864,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZOBvDguS3Tcf3dGD",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Bot Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract User Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract User Data": {
+      "main": [
+        [
+          {
+            "node": "Is Help Request?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Order Inquiry?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is FAQ Request?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Billing Question?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Need Human Support?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Help Request?": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Message": {
+      "main": [
+        [
+          {
+            "node": "Log Bot Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Order Inquiry?": {
+      "main": [
+        [
+          {
+            "node": "Handle Order Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Order Status": {
+      "main": [
+        [
+          {
+            "node": "Log Bot Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is FAQ Request?": {
+      "main": [
+        [
+          {
+            "node": "Send FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send FAQ": {
+      "main": [
+        [
+          {
+            "node": "Log Bot Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need Human Support?": {
+      "main": [
+        [
+          {
+            "node": "Confirm Human Escalation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Support Team",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Default Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Billing Question?": {
+      "main": [
+        [
+          {
+            "node": "Handle Billing Questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Billing Questions": {
+      "main": [
+        [
+          {
+            "node": "Log Bot Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 1,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
