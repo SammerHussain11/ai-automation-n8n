@@ -35,5 +35,5 @@ A reusable n8n workflow that extracts business listings from Google Maps, scrape
 - Keep secrets out of commits; use environment variables or n8n credential storage.
 
 ## License
+Sammer Hussain 
 
-MIT
