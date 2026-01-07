@@ -1,0 +1,401 @@
+{
+  "name": "End-to-End Voice AI Agent (Knowledge Ingestion + Conversational RAG)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [64, 352],
+      "id": "ce386a7f-4d74-49ce-ac77-e1ab24f0ce31",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "<REDACTED_FOLDER_ID>",
+            "mode": "list",
+            "cachedResultName": "voice-assistant-data",
+            "cachedResultUrl": "<REDACTED_URL>"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [288, 352],
+      "id": "9c554276-f5f7-464f-89ea-29e419ab330d",
+      "name": "Search files and folders",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [320, 64],
+      "id": "a5389dc0-cc64-4b09-bdcc-7a04cabf028c",
+      "name": "Download file",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [624, 0],
+      "id": "497478da-80c1-41c1-a79e-af02fc9f96b9",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "voice-assistant",
+          "mode": "list",
+          "cachedResultName": "voice-assistant"
+        },
+        "options": {
+          "pineconeNamespace": "doc-lib"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [864, 16],
+      "id": "b290cb1b-6f57-4310-a96a-bb93fc241f96",
+      "name": "Pinecone Vector Store",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [1056, 272],
+      "id": "1c64d5e2-b2e1-4d7e-a755-ce339db87215",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [720, 272],
+      "id": "3417de2e-be48-403e-a4ad-78274dd7bda1",
+      "name": "Embeddings Google Gemini",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [928, 464],
+      "id": "61bc8ac9-d7bb-4fc3-8300-ad577f786a4e",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c4e25ac2-a1c9-420e-a733-5434ad8ee42c",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [1040, -176],
+      "id": "5367019f-bbfa-484c-b0ce-4cd34d984247",
+      "name": "Webhook",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.question }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [1344, -176],
+      "id": "af217dab-e136-4aff-adef-8fb7763b4778",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [1232, 64],
+      "id": "d237c275-b4ae-4320-b44d-97563ce11ec3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "description": "Retrieves information about our projects"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [1568, 32],
+      "id": "a815015d-7cd3-45aa-93b7-9115e5c50f12",
+      "name": "Projects"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "voice-assistant",
+          "mode": "list",
+          "cachedResultName": "voice-assistant"
+        },
+        "options": {
+          "pineconeNamespace": "doc-lib"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [1360, 272],
+      "id": "ee7ca63a-64d6-4939-b596-b1bfedbc1942",
+      "name": "Pinecone Vector Store1",
+      "credentials": {}
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [1600, 448],
+      "id": "aca312f9-f5a1-441d-a75e-72cdc23c23a8",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [1936, 256],
+      "id": "cc6e39ab-9db5-4227-ade9-a8252507d65f",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1792, -176],
+      "id": "62441fd2-09cc-401d-b856-a0fb7e726b73",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "# 🎙️ End-to-End Voice AI Agent (RAG-Based)\n\nThis workflow powers a complete **Voice AI Agent** by combining \n**document ingestion**, **vector memory**, and **conversational intelligence**. \nIt enables the agent to understand voice/text queries and respond using its indexed knowledge base.\n\n---\n\n### 🔹 Phase 1: Knowledge Ingestion\n\n* **Manual Trigger** – Starts document indexing or re-indexing\n* **Google Drive (Search & Download)** – Fetches and downloads knowledge documents\n* **Split In Batches** – Processes files sequentially for scalability\n* **Text Splitter** – Chunks documents for better semantic retrieval\n* **Data Loader** – Converts files into structured text with metadata\n* **Gemini Embeddings** – Generates semantic vectors\n* **Pinecone (Insert Mode)** – Stores vectors as long-term memory\n\n---\n\n### 🔹 Phase 2: Conversational RAG\n\n* **Webhook** – Receives voice-to-text or text queries\n* **AI Agent** – Understands intent and orchestrates retrieval\n* **Pinecone (Query Mode)** – Retrieves relevant knowledge\n* **Gemini Chat Model** – Generates grounded, human-like responses\n* **Respond to Webhook** – Returns the final answer\n\n---\n\n### ✅ Outcome\n\n* Persistent memory with Pinecone\n* Semantic understanding via Gemini\n* Real-time conversational responses\n* Fully extensible Voice AI Agent\n\n",
+        "height": 976,
+        "width": 2816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-608, -288],
+      "typeVersion": 1,
+      "id": "74f307af-39a2-413e-ab3e-b39a8b1a715f",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Projects": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Projects",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Projects",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "<REDACTED>",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "<REDACTED>"
+  },
+  "id": "<REDACTED>",
+  "tags": []
+}
