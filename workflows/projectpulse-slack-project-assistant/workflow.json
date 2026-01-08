@@ -1,0 +1,380 @@
+{
+  "name": "piepdrive-test",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": ["app_mention", "message"],
+        "channelId": {
+          "__rl": true,
+          "value": "<SLACK_CHANNEL_ID>",
+          "mode": "list",
+          "cachedResultName": "n8n_channel"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [-384, -80],
+      "id": "050c61b8-aa11-43a5-88a2-ce316ff7a189",
+      "name": "Slack Trigger",
+      "webhookId": "<SLACK_TRIGGER_WEBHOOK_ID>",
+      "credentials": {
+        "slackApi": {
+          "id": "<SLACK_CREDENTIAL_ID>",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.blocks[0].elements[0].elements[1].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Slack Project Assistant AI integrated via n8n.\n\nYou will receive user messages from Slack. Based on the message, you will fetch information from one of five Google Sheets. Each Google Sheet represents a separate project and contains structured project information: project name, description, status, timelines, assigned resources, and recent updates.\n\nInstructions:\n1. Read the user's message carefully.\n2. Identify the relevant project.\n3. Retrieve information ONLY from the Google Sheet of that project.\n4. Respond in short, professional, and actionable sentences suitable for Slack.\n5. If the requested information is missing, respond: \"Is project ke liye is waqt yeh information available nahi hai.\"\n6. Do not make up information.\n7. Provide summaries or updates only based on sheet data.\n8. Do not expose internal IDs, sheet names, or technical details.\n\nTone & Style:\n- Professional, concise, and clear\n- Friendly but formal\n- No emojis unless the user uses them\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [-144, -80],
+      "id": "adf8d5c2-fabe-46d7-a320-f72775d6ca2a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [-464, 208],
+      "id": "fe30cc42-2a9c-456b-987b-13ae14b12985",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<GOOGLE_PALM_CREDENTIAL_ID>",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "<SLACK_CHANNEL_ID>",
+          "mode": "list",
+          "cachedResultName": "n8n_channel"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [208, -80],
+      "id": "6e31c828-a80b-4424-92e6-64b70ee52cd0",
+      "name": "Send a message",
+      "webhookId": "<SLACK_SEND_WEBHOOK_ID>",
+      "credentials": {
+        "slackApi": {
+          "id": "<SLACK_CREDENTIAL_ID>",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "n8n-key",
+        "sessionTTL": 300,
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [-288, 208],
+      "id": "f99d04b8-a7c6-4946-a6ac-7ea4c58c164d",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "<REDIS_CREDENTIAL_ID>",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEETS_SPREADSHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "Projects Detail",
+          "cachedResultUrl": "<GOOGLE_SHEETS_URL_PLACEHOLDER>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Project Alpha",
+          "cachedResultUrl": "<GOOGLE_SHEETS_URL_PLACEHOLDER>"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [-144, 208],
+      "id": "dec3b75d-00be-480a-8fe3-2eb3badb4945",
+      "name": "Project Alpha",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "<GOOGLE_SHEETS_CREDENTIAL_ID>",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEETS_SPREADSHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "Projects Detail",
+          "cachedResultUrl": "<GOOGLE_SHEETS_URL_PLACEHOLDER>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 826135326,
+          "mode": "list",
+          "cachedResultName": "Project Beta",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk/edit#gid=826135326"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [0, 208],
+      "id": "c070514f-aba3-4080-b1c7-ffd2a89865ed",
+      "name": "Project Beta",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "<GOOGLE_SHEETS_CREDENTIAL_ID>",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEETS_SPREADSHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "Projects Detail",
+          "cachedResultUrl": "<GOOGLE_SHEETS_URL_PLACEHOLDER>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1082456082,
+          "mode": "list",
+          "cachedResultName": "Project Gamma",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk/edit#gid=1082456082"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [128, 208],
+      "id": "9fec7ac4-6586-486a-b685-932543d58ba5",
+      "name": "Project Gamma",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "<GOOGLE_SHEETS_CREDENTIAL_ID>",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "<GOOGLE_SHEETS_SPREADSHEET_ID>",
+          "mode": "list",
+          "cachedResultName": "Projects Detail",
+          "cachedResultUrl": "<GOOGLE_SHEETS_URL_PLACEHOLDER>"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1003511742,
+          "mode": "list",
+          "cachedResultName": "Project Delta",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk/edit#gid=1003511742"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [272, 208],
+      "id": "11a9b0de-761e-411a-9b3c-8ba4e38e2e80",
+      "name": "Project Delta",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "<GOOGLE_SHEETS_CREDENTIAL_ID>",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk",
+          "mode": "list",
+          "cachedResultName": "Projects Detail",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 692846014,
+          "mode": "list",
+          "cachedResultName": "Project Epsilon",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ms4pUH1YFgFuaQVOS5tChz0efwUA1MuiYdDjZnMz-Rk/edit#gid=692846014"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [416, 208],
+      "id": "8b2db148-72fd-4c40-b352-c5ca3b24affb",
+      "name": "Project Epsilon",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1gqQPAXWdKqxaSAB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🟨 Sticky Note — Slack → n8n → AI Agent → Google Sheets\n🔹 Purpose\n\nAn AI-powered Slack Project Assistant that delivers accurate, \nreal-time project updates directly from Google Sheets \nwithout exposing any technical or internal details.\n\n🔁 Workflow Overview\n\n1️⃣ Slack Trigger 💬\nBot activates on mentions or messages in a defined channel.\n\n2️⃣ Context Setup 🧠\nMessage is extracted and short-term context is maintained via Redis.\n\n3️⃣ AI Agent\nIdentifies the correct project and enforces strict rules:\n❌ No hallucinations • ❌ No data leakage • ✅ Sheet-only answers\n\n4️⃣ Google Sheets (Source of Truth) 📊\nFetches status, timelines, owners, and latest updates.\nMissing data → safe fallback response.\n\n5️⃣ LLM Processing (Gemini) 🤖\nTransforms data into concise, professional Slack-ready replies.\n\n6️⃣ Slack Response ✅\nClean, business-focused insights delivered to the same channel.\n\n🧠 Key Strengths\n\n🔐 Secure project isolation • ⚡ Fast responses • 📌 High accuracy • 🧩 Easily scalable",
+        "height": 656,
+        "width": 1600,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1072, -144],
+      "typeVersion": 1,
+      "id": "f1a61a54-c4e0-4600-a89c-a5db35b75fbe",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Alpha": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Beta": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Gamma": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Delta": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Epsilon": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44978e58-a69a-43e8-86cc-375466aeb220",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "<INSTANCE_ID_PLACEHOLDER>"
+  },
+  "id": "w9APz1yOsA9BJ9k4",
+  "tags": []
+}
